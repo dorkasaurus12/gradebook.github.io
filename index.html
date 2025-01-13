@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradebook</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="gradebook-title">Gradebook</h1>
+
+<div class="form-group">
+    <label for="category-input">Add Category:</label>
+    <input type="text" id="category-input">
+    <button onclick="addCategoryHandler()">Add</button>
+</div>
+
+        <h2>Assignments:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Due Date</th>
+                    <th>Grade</th>
+                </tr>
+            </thead>
+            <tbody id="assignments-list"></tbody>
+        </table>
+
+        <h2>Accounts:</h2>
+        <h3>Students:</h3>
+        <ul id="students-list"></ul>
+
+        <h3>Staff:</h3>
+        <ul id="staff-list"></ul>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
