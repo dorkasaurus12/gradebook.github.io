@@ -1,84 +1,170 @@
-// Create a gradebook object
-const gradebook = {
-    categories: [],
-    assignments: [],
-    accounts: {
-        students: [],
-        staff: []
+const unitBumf = `<div>
+  <div class="lesson">
+    <div class="lesson-title">Title here</div>
+    <ul class="lesson-activities">
+      <li class="activity">
+        <div class="activity-done"></div>
+        <div class="activity-title">Activity title goes here <span class="skill-tag">Skill tag</span></div>
+        <div class="activity-data"></div>
+      </li>
+      <li class="activity">
+        <div class="activity-done"></div>
+        <div class="activity-title">Activity title goes here <span class="skill-tag">Skill tag</span></div>
+        <div class="activity-data"></div>
+      </li>
+    </ul>
+  </div>
+  <div class="lesson">
+    <div class="lesson-title">Title here</div>
+    <ul class="lesson-activities">
+      <li class="activity">
+        <div class="activity-done"></div>
+        <div class="activity-title">Activity title goes here <span class="skill-tag">Skill tag</span></div>
+        <div class="activity-data"></div>
+      </li>
+    </ul>
+  </div>
+</div>`
+
+const menuData = {
+  units: [
+    {
+      prefix: "1",
+      title: "How was your vacation?",
+      activities: {
+        done: 13,
+        available: 13
+      },
+      pointsGot: 82,
+      pointsAvailable: 82,
+      award: "trophy"
+    },
+   {
+      prefix: "2",
+      title: "I think it's exciting!",
+      activities: {
+        done: 12,
+        available: 13
+      },
+      pointsGot: 71,
+      pointsAvailable: 84,
+      award: "gold"
+    },
+   {
+      prefix: "3",
+      title: "Do it before you're 30!",
+      activities: {
+        done: 12,
+        available: 15
+      },
+      pointsGot: 64,
+      pointsAvailable: 81,
+      award: "silver"
+    },
+   {
+      prefix: "R1",
+      title: "Review: Units 1–3",
+      activities: {
+        done: 6,
+        available: 6
+      },
+      pointsGot: 38,
+      pointsAvailable: 41,
+      award: "gold"
+    },    
+   {
+      prefix: "4",
+      title: "The best place in the world!",
+      activities: {
+        done: 12,
+        available: 19
+      },
+      pointsGot: 55,
+      pointsAvailable: 107,
+      award: "bronze"
+    },
+   {
+      prefix: "5",
+      title: "I think it’s exciting! A whole unit on Rare Stamps: a list of postage stamps that are especially notable in some way, often due to antiquity or a postage stamp error.",
+      activities: {
+        done: 12,
+        available: 19
+      },
+      pointsGot: 55,
+      pointsAvailable: 107,
+      award: "bronze"
+    },
+   {
+      prefix: "6",
+      title: "The best place in the world!",
+      activities: {
+        done: 4,
+        available: 18
+      },
+      pointsGot: 14,
+      pointsAvailable: 87
+    },
+   {
+      prefix: "R2",
+      title: "Review: Units 4–6",
+      activities: {
+        done: 0,
+        available: 6
+      },
+      pointsGot: 0,
+      pointsAvailable: 41,
+      notStarted: true
+    }    
+  ]
+}
+Handlebars.registerHelper('circle', function(activities) {
+  const radius = 17;
+  const fraction = (activities.done / activities.available);
+  const stroke = Math.PI * (radius + radius);
+  return stroke - (fraction * stroke);
+});
+Handlebars.registerHelper('grey', function(activities) {
+  let className = 'not-started'
+  if  (activities.done > 0){
+    className = ''
+  }
+  return className;
+});
+
+var templateUnit = document.querySelector('.tmpl-unit').innerHTML,
+      templateData = menuData,
+    templateCompile = Handlebars.compile(templateUnit);
+document.querySelector('.unit-list').innerHTML = templateCompile(templateData);
+
+const units = document.querySelectorAll('.unit');
+
+function openUnit(e) {
+  const unitDOM = e.currentTarget;
+  console.log(e)
+  //if not active
+  if( ! unitDOM.classList.contains('active') ) {
+    //close other active:
+    for (var unit of units) {
+      if(unit.classList.contains('active') ){
+        unit.classList.remove('active');
+        unit.querySelector('.lessons').remove(); 
+      }
     }
-};
+    //mark as active:
+    unitDOM.classList.add('active');
+    //add fake content:
+    const content = document.createElement("div");
+    content.classList.add('lessons');
+    content.innerHTML = unitBumf
+    unitDOM.append(content);
+  } else{
+    unitDOM.classList.remove('active');
+    unitDOM.querySelector('.lessons').remove(); 
+  }
 
-// Function to add category and update UI
-function addCategoryHandler() {
-    const categoryInput = document.getElementById('category-input');
-    const categoryName = categoryInput.value;
-    if (categoryName) {
-        addCategory(categoryName);
-        displayCategories();
-        categoryInput.value = '';
-    } else {
-        alert('Please enter a category name');
-    }
+
 }
 
-// Function to display categories in the UI
-function displayCategories() {
-    const categoriesList = document.getElementById('categories-list');
-    categoriesList.innerHTML = '';
-    gradebook.categories.forEach(category => {
-        const li = document.createElement('li');
-        li.textContent = category;
-        categoriesList.appendChild(li);
-    });
+for (var unit of units) {
+  unit.addEventListener('click', openUnit);
 }
-
-// Function to add assignment with due date and grade
-function addAssignment(assignmentName, dueDate, grade) {
-    gradebook.assignments.push({ name: assignmentName, dueDate: dueDate, grade: grade, submissions: {} });
-}
-
-// Function to add student account
-function addStudent(name, id) {
-    const student = { name: name, id: id, grades: {} };
-    gradebook.accounts.students.push(student);
-    gradebook.assignments.forEach(assignment => {
-        student.grades[assignment.name] = null;
-    });
-}
-
-// Function to add staff account
-function addStaff(name, id) {
-    const staff = { name: name, id: id };
-    gradebook.accounts.staff.push(staff);
-}
-
-// Function to submit assignment by student
-function submitAssignment(studentId, assignmentName, grade) {
-    const student = gradebook.accounts.students.find(student => student.id === studentId);
-    if (student) {
-        const assignment = gradebook.assignments.find(assignment => assignment.name === assignmentName);
-        if (assignment) {
-            student.grades[assignmentName] = grade;
-            assignment.submissions[studentId] = grade;
-        } else {
-            console.log('Assignment not found');
-        }
-    } else {
-        console.log('Student not found');
-    }
-}
-
-// Sample usage
-addCategory('Homework');
-addCategory('Exams');
-
-addAssignment('Homework 1', '2022-10-10', 85);
-addAssignment('Exam 1', '2022-11-05', 90);
-
-addStudent('Alice', 'A123');
-addStudent('Bob', 'B456');
-
-addStaff('Teacher1', 'T789');
-
-// Student Alice submits Homework 1
-submitAssignment('A123', 'Homework 1', 80);
